@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zowie Widget Locale</title>
+  <title>Zowie Locale Switcher (Works!)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -39,42 +39,53 @@
     </div>
   </div>
 
-  <!-- Load widget after page content -->
+  <!-- ✅ THIS PART IS THE WORKING ZOWIE WIDGET LOADER -->
   <script type="text/javascript">
     const urlParams = new URLSearchParams(window.location.search);
     const locale = urlParams.get('locale') || 'en-US';
-    const [lang, country] = locale.split('-');
 
+    // show current locale in UI
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('languageInput').value = lang || 'en';
-      document.getElementById('countryInput').value = country || 'US';
+      const [lang, country] = locale.split('-');
+      document.getElementById('languageInput').value = lang;
+      document.getElementById('countryInput').value = country;
       document.getElementById('current-locale').textContent = locale;
 
-      const updateButton = document.getElementById('updateButton');
-      updateButton.addEventListener('click', () => {
-        const lang = document.getElementById('languageInput').value.trim().toLowerCase();
-        const country = document.getElementById('countryInput').value.trim().toUpperCase();
-        const newLocale = `${lang}-${country}`;
+      document.getElementById('updateButton').addEventListener('click', () => {
+        const newLang = document.getElementById('languageInput').value.trim().toLowerCase();
+        const newCountry = document.getElementById('countryInput').value.trim().toUpperCase();
+        const newLocale = `${newLang}-${newCountry}`;
         window.location.search = `?locale=${newLocale}`;
       });
     });
 
-    // Load Zowie widget script (official way)
+    // ✅ EXACTLY LIKE ZOWIE's OWN DEPLOYMENT
     (function(cb) {
       var js = document.createElement("script");
+      if (js.readyState) {
+        js.onreadystatechange = function () {
+          if (js.readyState === "loaded" || js.readyState === "complete") {
+            js.onreadystatechange = null;
+            cb();
+          }
+        };
+      } else {
+        js.onload = function () {
+          cb();
+        };
+      }
       js.type = "module";
       js.defer = true;
       js.src = "https://nayax.chat.getzowie.com/web/chat-widget/zowie-widget-entry.js";
-      js.onload = cb;
       document.body.appendChild(js);
-    })(function() {
-      console.log('Zowie widget is ready. Initializing with locale:', locale);
+    })(function () {
+      console.log("ZowieWidget initializing with locale:", locale);
       try {
         ZowieWidget.init("f8d2876f02f44966b94842313d7e0710", {
           metadata: { locale: locale }
         });
       } catch (e) {
-        console.error('ZowieWidget init failed:', e);
+        console.error("ZowieWidget init failed:", e);
       }
     });
   </script>
