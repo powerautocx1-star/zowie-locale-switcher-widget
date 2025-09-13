@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zowie Chat Locale Switcher</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+  </style>
+  <script type="module" id="zowie-widget-script" defer src="https://nayax.chat.getzowie.com/web/chat-widget/zowie-widget-entry.js"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
+
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md space-y-6">
+    <h1 class="text-3xl font-bold text-center text-gray-800">Zowie Widget Locale</h1>
+
+    <p id="status-message" class="text-center text-sm font-medium text-blue-600 transition-opacity opacity-0">
+      Locale updated to:
+      <span id="current-locale" class="font-bold"></span>
+    </p>
+
+    <div class="space-y-4">
+      <div>
+        <label for="languageInput" class="block text-sm font-medium text-gray-700">Language Code</label>
+        <input type="text" id="languageInput" value="en" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div>
+        <label for="countryInput" class="block text-sm font-medium text-gray-700">Country Code</label>
+        <input type="text" id="countryInput" value="US" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <button id="updateButton" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+        Update Locale
+      </button>
+    </div>
+  </div>
+
+  <!-- Zowie widget will float in the corner -->
+  <script>
+    function loadZowieWidget(locale) {
+      if (window.ZowieWidget) {
+        try {
+          ZowieWidget.init("f8d2876f02f44966b94842313d7e0710", {
+            metadata: { locale: locale }
+          });
+        } catch (e) {
+          console.error("Failed to initialize ZowieWidget:", e);
+        }
+      } else {
+        setTimeout(() => loadZowieWidget(locale), 100);
+      }
+
+      const statusMessage = document.getElementById('status-message');
+      const currentLocaleSpan = document.getElementById('current-locale');
+      currentLocaleSpan.textContent = locale;
+      statusMessage.classList.remove('opacity-0');
+      setTimeout(() => {
+        statusMessage.classList.add('opacity-0');
+      }, 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const updateButton = document.getElementById('updateButton');
+      const languageInput = document.getElementById('languageInput');
+      const countryInput = document.getElementById('countryInput');
+
+      const defaultLocale = 'en-US';
+      languageInput.value = 'en';
+      countryInput.value = 'US';
+      loadZowieWidget(defaultLocale);
+
+      updateButton.addEventListener('click', () => {
+        const lang = languageInput.value.toLowerCase().trim();
+        const country = countryInput.value.toUpperCase().trim();
+        const locale = `${lang}-${country}`;
+        if (lang && country) {
+          loadZowieWidget(locale);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
